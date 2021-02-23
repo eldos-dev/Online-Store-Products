@@ -45,9 +45,19 @@ class User(AbstractBaseUser):
         return self.is_staff
 
 
+    def create_activation_code(self):
+        from django.utils.crypto import get_random_string
+        code = get_random_string(15)
+        if User.objects.filter(activation_code=code).exists():
+            self.create_activation_code()
+        self.activation_code = code
+        self.save(update_fields=['activation_code'])
+
+
+
 #TODO: Отображение продуктов и категорий     +
-#TODO: Регистрация, Активация, Логин
-#TODO: Загрузка и отображения картинок
+#TODO: Загрузка и отображения картинок +
+#TODO: Регистрация, Активация, Логин +
 #TODO: Верстка
 #TODO: Формы
 #TODO: CRUD

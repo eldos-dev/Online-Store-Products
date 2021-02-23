@@ -1,35 +1,40 @@
 from django.http import Http404
-from django.shortcuts import render, get_list_or_404, get_object_or_404
+from django.views.generic import ListView, DetailView
 
 from .models import Product, Category
 
 
-def index(request):
-    categories = Category.objects.all()
-
-    context = {
-        'categories': categories
-    }
-    return render(request, 'product/index.html', context)
+class HomePageView(ListView):
+    model = Category
+    context_object_name = 'categories'
+    template_name = 'product/index.html'
 
 
+class ProductsListView(ListView):
+    model = Product
+    template_name = 'product/products_list.html'
+    context_object_name = 'products'
 
-def products_list(request, category_slug):
-    if not Category.objects.filter(slug=category_slug).exists():
-        raise Http404('Нет такой категории')
-    products = Product.objects.filter(category_id=category_slug)
-    context = {
-            'products': products
-        }
-    return render(request, 'product/products_list.html', context)
+    # def get(self, request, category_slug):
+    #     if not Category.objects.filter(slug=category_slug).exists():
+    #         raise Http404('Нет такой категории')
+    #     products = self.get_queryset().filter(category_id=category_slug)
+    #     context = {
+    #         'products': products
+    #     }
+    #     return render(request, 'product/products_list.html', context)
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        category_slug = self.kwargs.get('category_slug')
+        if not Category.objects.filter(slug=category_slug).exists():
+            raise Http404('Нет такой категории')
+        queryset = queryset.filter(category_id=category_slug)
+        return queryset
 
-def product_details(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    context = {
-        'product': product
-    }
-    return render(request, 'product/product_details.html', context)
+class ProductDetail(DetailView):
+    model = Product
+    template_name = 'product/product_details.html'
 
 
 
@@ -53,12 +58,41 @@ def product_details(request, product_id):
 #TODO: Подключить картинки для товаров +
 #TODO: Добавить детали продукта   + product_details
 #TODO: Сделать переход из категории в листинг продуктов +
-
 #TODO: переписать вьюшки на CBV
 
 # =======================================================================================================================================
+# def index(request):
+#     categories = Category.objects.all()
 #
+#     context = {
+#         'categories': categories
+#     }
+#     return render(request, 'product/index.html', context)
+
+
+    # class ProductsListView(View):
+    #     def get(self, request, category_slug):
+    #         if not Category.objects.filter(slug=category_slug).exists():
+    #             raise Http404('Нет такой категории')
+    #         products = Product.objects.filter(category_id=category_slug)
+    #         context = {
+    #             'products': products
+    #         }
+    #         return render(request, 'product/products_list.html', context)
+
+
 #
+# def products_list(request, category_slug):
+#     if not Category.objects.filter(slug=category_slug).exists():
+#         raise Http404('Нет такой категории')
+#     products = Product.objects.filter(category_id=category_slug)
+#     context = {
+#         'products': products
+#     }
+#     return render(request, 'product/products_list.html', context)
+#
+
+
 # def products_list(request, category_slug):
 #     products = get_list_or_404(Product, category_id=category_slug)
 #     context = {
@@ -66,6 +100,12 @@ def product_details(request, product_id):
 #     }
 #     return render(request, 'product/products_list.html', context)
 
+# def product_details(request, product_id):
+#     product = get_object_or_404(Product, id=product_id)
+#     context = {
+#         'product': product
+#     }
+#     return render(request, 'product/product_details.html', context)
 
 
 # Первый вариант. Вывода продуктов, которые относятся к определенному категории
