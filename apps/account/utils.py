@@ -11,10 +11,10 @@ def send_activation_mail(user):
         [user.email,])
 
 
-#TODO: генерация кода активации create_activation_code()
-#TODO: активация
-#TODO: логин
-#TODO: логаут
+#TODO: генерация кода активации create_activation_code() +
+#TODO: активация +
+#TODO: логин +
+#TODO: логаут +
 #TODO: смена пароля
 #TODO: забыли пароль
 #TODO: smtp 
